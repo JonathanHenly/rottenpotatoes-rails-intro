@@ -11,7 +11,23 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    # if the sort_by parameter is non-nil
+    if params[:sort_by] then
+      sort = params[:sort_by]
+      @movies = Movie.order(sort).all
+      
+      # check which header to highlight
+      if sort == 'title'
+        @title_header = 'hilite'
+      elsif sort == 'release_date'
+        @release_date_header = 'hilite'
+      end
+      
+    else
+      # return non sorted list of movies
+      @movies = Movie.all
+    end
+    
   end
 
   def new

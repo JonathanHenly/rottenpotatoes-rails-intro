@@ -11,10 +11,18 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings = Movie.getRatings
+    @movies = Movie.all
+    
+    if params[:ratings] then
+      ratings = params[:ratings]
+      @movies = @movies.find(ratings)
+    end
+    
     # if the sort_by parameter is non-nil
     if params[:sort_by] then
       sort = params[:sort_by]
-      @movies = Movie.order(sort).all
+      @movies = @movies.order(sort)
       
       # check which header to highlight
       if sort == 'title'
@@ -23,11 +31,7 @@ class MoviesController < ApplicationController
         @release_date_header = 'hilite'
       end
       
-    else
-      # return non sorted list of movies
-      @movies = Movie.all
     end
-    
   end
 
   def new

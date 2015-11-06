@@ -12,20 +12,39 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.get_ratings
-    ratings = params[:ratings] ||= session[:ratings]
-    sorting = params[:sort_by] ||= session[:sort_by]
     
-    @movies = Movie.all unless ratings || sorting
+    @selected_ratings = params[:ratings]
+    sorting = params[:sort_by]
+    re_direct = false
     
-    if ratings then
-      session[:ratings] = ratings
-      @movies = Movie.where(:rating => ratings.keys)
+    if session[:ratings] && !@selected_ratings then
+      re_direct = true
+      flash.keep
+      @selected_ratings = session[:ratings]
     end
     
-    # if the sort_by or session sort_by parameter is non-nil
+    if session[:sort_by] && !sorting then
+      re_direct = true
+      flash.keep
+      sorting = session[:sort_by]
+    end
+    
+    if re_direct then redirect_to movies_path(:ratings => @selected_ratings, :sort_by => sorting) end
+    
+    # if selected ratings is non-nil
+    if @selected_ratings then
+      # store the selected ratings in the session
+      session[:ratings] = @selected_ratings
+      @movies = (@movies ||= Movie).where(:rating => @selected_ratings.keys)
+    else
+      @selected_ratings = Movie.get_all_ratings_selected
+    end
+    
+    # if the sort_by parameter is non-nil
     if sorting then
+      # store the sorting in the session
       session[:sort_by] = sorting
-      @movies = @movies.order(sorting.to_sym)
+      @movies = (@movies ||= Movie).order(sorting.to_sym)
       # check which header to highlight
       if sorting == 'title'
         @title_header = 'hilite'
@@ -33,7 +52,6 @@ class MoviesController < ApplicationController
         @release_date_header = 'hilite'
       end
     end
-    #request.session.each {|key, value| puts key.to_s + " --> " + value.to_s }
     
   end
 

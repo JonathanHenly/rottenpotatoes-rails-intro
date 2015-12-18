@@ -6,6 +6,12 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+
+Movie.all.each_with_index do |movie, index|
+  puts "Removed Movie[#{index}]: #{movie.title}"
+  movie.destroy
+end
+
 movies = [
     {:title => 'Aladdin', :rating => 'G', :release_date => '25-Nov-1992'},
     {:title => 'The Terminator', :rating => 'R', :release_date => '26-Oct-1984'},
@@ -19,6 +25,12 @@ movies = [
     {:title => 'Chicken Run', :rating => 'G', :release_date => '21-Jun-2000'},
 ]
 
-movies.each do |movie|
+movies.each_with_index do |movie, index|
   Movie.create!(movie)
+  puts "Added Movie[#{index}]: #{movie[:title]}"
+end
+
+puts "Outputting Movie Database:"
+Movie.all.each_with_index do |movie, index|
+  puts "Movie[#{index}]: #{movie.title}"
 end
